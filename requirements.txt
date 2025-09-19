@@ -1,0 +1,10 @@
+scikit-learn
+streamlit
+dash
+dash-bootstrap-components
+flask
+paho-mqtt
+plotly
+pandas
+numpy
+requests

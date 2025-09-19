@@ -1,0 +1,213 @@
+{
+  "zones": [
+    {
+      "zone_id": "A",
+      "zone_name": "North_Pit_Wall",
+      "coordinates": {
+        "lat": 45.7749,
+        "lon": -122.4194,
+        "elevation": 1250
+      },
+      "geometry": {
+        "type": "polygon",
+        "coordinates": [
+          [45.7745, -122.4200],
+          [45.7753, -122.4200],
+          [45.7753, -122.4188],
+          [45.7745, -122.4188],
+          [45.7745, -122.4200]
+        ]
+      },
+      "risk_thresholds": {
+        "displacement_warning": 5.0,
+        "displacement_critical": 8.0,
+        "vibration_warning": 1.5,
+        "vibration_critical": 2.5
+      },
+      "characteristics": {
+        "rock_type": "granite",
+        "slope_angle": 65,
+        "height_m": 85,
+        "stability_rating": "stable"
+      },
+      "sensors": [
+        {
+          "sensor_id": "A001",
+          "type": "displacement",
+          "location": "top_bench"
+        },
+        {
+          "sensor_id": "A002",
+          "type": "vibration",
+          "location": "mid_slope"
+        },
+        {
+          "sensor_id": "A003",
+          "type": "weather",
+          "location": "top_bench"
+        }
+      ]
+    },
+    {
+      "zone_id": "B",
+      "zone_name": "South_Slope",
+      "coordinates": {
+        "lat": 45.7735,
+        "lon": -122.4190,
+        "elevation": 1180
+      },
+      "geometry": {
+        "type": "polygon",
+        "coordinates": [
+          [45.7731, -122.4196],
+          [45.7739, -122.4196],
+          [45.7739, -122.4184],
+          [45.7731, -122.4184],
+          [45.7731, -122.4196]
+        ]
+      },
+      "risk_thresholds": {
+        "displacement_warning": 4.0,
+        "displacement_critical": 7.0,
+        "vibration_warning": 1.2,
+        "vibration_critical": 2.0
+      },
+      "characteristics": {
+        "rock_type": "sandstone",
+        "slope_angle": 72,
+        "height_m": 95,
+        "stability_rating": "moderate"
+      },
+      "sensors": [
+        {
+          "sensor_id": "B001",
+          "type": "displacement",
+          "location": "top_bench"
+        },
+        {
+          "sensor_id": "B002",
+          "type": "vibration",
+          "location": "base"
+        },
+        {
+          "sensor_id": "B003",
+          "type": "weather",
+          "location": "mid_slope"
+        }
+      ]
+    },
+    {
+      "zone_id": "C",
+      "zone_name": "East_Bench",
+      "coordinates": {
+        "lat": 45.7752,
+        "lon": -122.4175,
+        "elevation": 1320
+      },
+      "geometry": {
+        "type": "polygon",
+        "coordinates": [
+          [45.7748, -122.4181],
+          [45.7756, -122.4181],
+          [45.7756, -122.4169],
+          [45.7748, -122.4169],
+          [45.7748, -122.4181]
+        ]
+      },
+      "risk_thresholds": {
+        "displacement_warning": 6.0,
+        "displacement_critical": 10.0,
+        "vibration_warning": 2.0,
+        "vibration_critical": 3.5
+      },
+      "characteristics": {
+        "rock_type": "limestone",
+        "slope_angle": 45,
+        "height_m": 60,
+        "stability_rating": "very_stable"
+      },
+      "sensors": [
+        {
+          "sensor_id": "C001",
+          "type": "displacement",
+          "location": "bench_edge"
+        },
+        {
+          "sensor_id": "C002",
+          "type": "vibration",
+          "location": "bench_center"
+        }
+      ]
+    },
+    {
+      "zone_id": "D",
+      "zone_name": "West_Highwall",
+      "coordinates": {
+        "lat": 45.7742,
+        "lon": -122.4210,
+        "elevation": 1420
+      },
+      "geometry": {
+        "type": "polygon",
+        "coordinates": [
+          [45.7738, -122.4216],
+          [45.7746, -122.4216],
+          [45.7746, -122.4204],
+          [45.7738, -122.4204],
+          [45.7738, -122.4216]
+        ]
+      },
+      "risk_thresholds": {
+        "displacement_warning": 3.5,
+        "displacement_critical": 6.0,
+        "vibration_warning": 1.0,
+        "vibration_critical": 1.8
+      },
+      "characteristics": {
+        "rock_type": "shale",
+        "slope_angle": 80,
+        "height_m": 120,
+        "stability_rating": "unstable"
+      },
+      "sensors": [
+        {
+          "sensor_id": "D001",
+          "type": "displacement",
+          "location": "top_wall"
+        },
+        {
+          "sensor_id": "D002",
+          "type": "vibration",
+          "location": "mid_wall"
+        },
+        {
+          "sensor_id": "D003",
+          "type": "weather",
+          "location": "top_wall"
+        },
+        {
+          "sensor_id": "D004",
+          "type": "accelerometer",
+          "location": "base"
+        }
+      ]
+    }
+  ],
+  "mine_info": {
+    "mine_name": "Mountain View Open Pit",
+    "operator": "Rocky Ridge Mining Co.",
+    "center_coordinates": {
+      "lat": 45.7743,
+      "lon": -122.4192
+    },
+    "operational_hours": {
+      "start": "06:00",
+      "end": "18:00"
+    },
+    "emergency_contacts": {
+      "site_manager": "+1-555-0101",
+      "safety_officer": "+1-555-0102",
+      "emergency_services": "911"
+    }
+  }
+}

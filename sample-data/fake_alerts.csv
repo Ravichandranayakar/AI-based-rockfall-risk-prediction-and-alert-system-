@@ -1,0 +1,12 @@
+alert_id,timestamp,zone_id,zone_name,alert_level,risk_score,trigger_reason,recommended_action,status,resolved_timestamp,operator_notes,displacement_mm,vibration_mm_s,temperature_c,humidity_percent
+ALT001,2024-09-19 08:45:00,D,West_Highwall,WARNING,7.2,high_displacement,Monitor closely and restrict access,RESOLVED,2024-09-19 09:15:00,Displacement stabilized after equipment removal,,,,
+ALT002,2024-09-19 09:00:00,B,South_Slope,CRITICAL,8.8,critical_vibration,Immediate evacuation required,RESOLVED,2024-09-19 09:30:00,Vibration from blasting operations completed,,,,
+ALT003,2024-09-19 09:15:00,D,West_Highwall,CRITICAL,9.1,critical_displacement,Immediate evacuation and equipment removal,ACTIVE,,Visual inspection shows visible cracks,,,,
+ALT004,2024-09-18 14:30:00,A,North_Pit_Wall,WARNING,6.5,moderate_displacement,Increase monitoring frequency,RESOLVED,2024-09-18 16:00:00,Rain-induced movement subsided,,,,
+ALT005,2024-09-18 11:20:00,B,South_Slope,WARNING,6.8,high_vibration,Reduce blast intensity in adjacent areas,RESOLVED,2024-09-18 12:00:00,Blasting operations modified,,,,
+ALT006,2024-09-17 16:45:00,D,West_Highwall,CRITICAL,8.9,critical_displacement,Emergency evacuation protocol activated,RESOLVED,2024-09-17 18:30:00,Geological survey confirmed stability,,,,
+ALT007,2024-09-17 10:15:00,C,East_Bench,INFO,4.2,routine_inspection,Schedule routine maintenance,RESOLVED,2024-09-17 14:00:00,Maintenance completed successfully,,,,
+ALT008,2024-09-16 13:30:00,A,North_Pit_Wall,WARNING,7.0,weather_related,Monitor for 24 hours post-rainfall,RESOLVED,2024-09-17 13:30:00,No further movement detected,,,,
+ALT009,2024-09-16 09:45:00,B,South_Slope,CRITICAL,9.0,multiple_factors,Full zone evacuation required,RESOLVED,2024-09-16 15:00:00,Rockfall event cleared safely,,,,
+ALT010,2024-09-15 15:20:00,D,West_Highwall,WARNING,6.9,sensor_anomaly,Verify sensor readings and recalibrate,RESOLVED,2024-09-15 17:00:00,Sensor recalibration completed,,,,
+ALT011,2025-09-19 21:43:24,A,North_Pit_Wall,WARNING,7.2,high_displacement_high_vibration_high_risk_score_multiple_factors,monitor_closely_and_restrict_access,ACTIVE,,,6.5,1.8,23.0,65.0
