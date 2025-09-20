@@ -66,8 +66,6 @@ The **Simple Dashboard** (`SIMPLE_DASHBOARD.bat`) is specifically designed for *
 - **Caution Areas Count** - Yellow cards with warning symbol  
 - **Danger Zones Count** - Red cards with emergency symbol
 
-**Key Points for Jury:**
-> *"Each card shows exactly how many areas are in each safety category. This gives mine supervisors instant knowledge of overall site safety."*
 
 ### **3. Individual Zone Information**
 **What Each Zone Shows:**
@@ -76,8 +74,7 @@ The **Simple Dashboard** (`SIMPLE_DASHBOARD.bat`) is specifically designed for *
 - **Recommended Action** (Clear instructions for workers)
 - **Large Visual Indicators** (Emojis and colors for instant recognition)
 
-**Jury Explanation:**
-> *"Every area of the mine is monitored individually. Workers can quickly see which areas are safe to enter and which require caution or evacuation."*
+
 
 ### **4. Automatic Refresh System**
 **Technical Feature Made Simple:**
@@ -85,56 +82,6 @@ The **Simple Dashboard** (`SIMPLE_DASHBOARD.bat`) is specifically designed for *
 - Displays "Every 30 seconds" refresh rate
 - Manual refresh button for demonstrations
 
-**Why This Matters to Jury:**
-> *"The system never sleeps. It continuously monitors and updates, ensuring worker safety 24/7 without human intervention."*
-
----
-
-## 📋 **Demonstration Script for SIH Jury**
-
-### **Opening Statement (30 seconds):**
-> *"Honorable jury members, what you're seeing is a revolutionary mine safety system that could prevent mining accidents through AI-powered early warning. This simple interface shows real-time safety conditions across an entire mine site."*
-
-### **Live Demonstration (2 minutes):**
-
-**Step 1: Overview Explanation**
-> *"The top section shows our overall safety status. Currently, we have [X] safe areas, [Y] areas requiring caution, and [Z] danger zones that need immediate attention."*
-
-**Step 2: Click Refresh Button**
-> *"Watch as I refresh the data manually - this simulates the automatic 30-second updates. In a real mine, sensors continuously send data to update these displays."*
-
-**Step 3: Point to Individual Zones**
-> *"Each mine area is monitored separately. See this red zone marked 'South Area'? It shows 'DANGER - Stay Away!' with clear instructions. Workers would immediately know to evacuate."*
-
-**Step 4: Explain Color System**
-> *"The color system is universal - Green means go, Yellow means caution, Red means stop. No training required - any worker instantly understands the danger level."*
-
-### **Impact Statement (30 seconds):**
-> *"This system would have prevented [relevant mining accident]. By providing 30-second updates and clear visual warnings, workers have early warning before dangerous rockfall conditions develop."*
-
----
-
-## 🎯 **Key Advantages for Jury Understanding**
-
-### **1. Immediate Comprehension**
-- **No Training Required** - Color system is intuitive
-- **Clear Language** - No technical terminology
-- **Visual Design** - Information visible at a glance
-
-### **2. Real-World Application**
-- **24/7 Operation** - Continuous monitoring without breaks
-- **Instant Alerts** - Workers warned before danger develops
-- **Clear Instructions** - Each zone shows specific recommended actions
-
-### **3. Cost-Effective Implementation**
-- **Uses Existing Infrastructure** - Works with standard mine sensors
-- **Scalable Design** - Can monitor any number of mine zones
-- **Low Maintenance** - Automated system requires minimal oversight
-
-### **4. Legal & Compliance Benefits**
-- **Audit Trail** - All safety decisions documented with timestamps
-- **Regulatory Compliance** - Meets mine safety reporting requirements
-- **Evidence of Due Diligence** - Shows proactive safety measures
 
 ---
 
@@ -164,21 +111,6 @@ The **Simple Dashboard** (`SIMPLE_DASHBOARD.bat`) is specifically designed for *
 - **Mobile Alerts** - Text messages to supervisors
 - **Radio Integration** - Automatic mine radio broadcasts
 
----
-
-## 💡 **Questions Jury Might Ask & Your Answers**
-
-### **Q: "How accurate is this system?"**
-**A:** *"Our AI models are trained on thousands of hours of real mine sensor data and can predict dangerous conditions with 85-95% accuracy, providing early warning 5-30 minutes before rockfall events."*
-
-### **Q: "What if the system fails?"**
-**A:** *"The system includes multiple backup servers and fail-safe protocols. If monitoring is interrupted, all areas automatically default to 'caution' status until monitoring is restored."*
-
-### **Q: "How much does this cost to implement?"**
-**A:** *"The software works with existing mine sensors, requiring minimal additional hardware. Implementation cost is approximately 10-20% of traditional monitoring systems while providing 24/7 automated protection."*
-
-### **Q: "Who monitors this system?"**
-**A:** *"The system is fully automated but includes supervisor oversight. Mine safety officers can view the dashboard and receive automatic alerts when dangerous conditions develop."*
 
 ---
 
