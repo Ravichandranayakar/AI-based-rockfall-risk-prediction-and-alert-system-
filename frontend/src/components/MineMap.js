@@ -1,9 +1,23 @@
-import React from 'react';
-import { RefreshCw, Maximize, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { RefreshCw, Maximize, Minimize, AlertTriangle, Mountain, MapPin, Zap, Shield, Activity } from 'lucide-react';
 
 const MineMap = ({ zones = [], onZoneSelect, selectedZone }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  
   // Ensure zones is an array
   const zonesArray = Array.isArray(zones) ? zones : [];
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
   
   const getZoneColor = (riskLevel) => {
     switch (riskLevel) {
@@ -37,8 +51,72 @@ const MineMap = ({ zones = [], onZoneSelect, selectedZone }) => {
     }
   };
 
+  const handleFullscreen = () => {
+    const mapElement = document.getElementById('mine-map-container');
+    if (mapElement) {
+      if (!document.fullscreenElement && !isFullscreen) {
+        // Try native fullscreen first
+        if (mapElement.requestFullscreen) {
+          mapElement.requestFullscreen().then(() => {
+            setIsFullscreen(true);
+            console.log('Entered fullscreen mode');
+          }).catch(err => {
+            console.log('Fullscreen not supported, using fallback');
+            enterFallbackFullscreen(mapElement);
+          });
+        } else {
+          // Fallback for browsers that don't support fullscreen
+          enterFallbackFullscreen(mapElement);
+        }
+      } else if (document.fullscreenElement) {
+        document.exitFullscreen().then(() => {
+          setIsFullscreen(false);
+          console.log('Exited fullscreen mode');
+        });
+      } else {
+        exitFallbackFullscreen(mapElement);
+      }
+    }
+  };
+
+  const enterFallbackFullscreen = (element) => {
+    element.classList.add('mine-map-maximized');
+    setIsFullscreen(true);
+    
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.id = 'fullscreen-close-btn';
+    closeBtn.innerHTML = '✕ Close Fullscreen';
+    closeBtn.style.cssText = `
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 10000;
+    `;
+    closeBtn.onclick = () => exitFallbackFullscreen(element);
+    element.appendChild(closeBtn);
+  };
+
+  const exitFallbackFullscreen = (element) => {
+    element.classList.remove('mine-map-maximized');
+    setIsFullscreen(false);
+    
+    // Remove close button
+    const closeBtn = document.getElementById('fullscreen-close-btn');
+    if (closeBtn) {
+      closeBtn.remove();
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div id="mine-map-container" className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium text-gray-900">Mine Zone Map</h3>
         <div className="flex space-x-2">
@@ -49,16 +127,20 @@ const MineMap = ({ zones = [], onZoneSelect, selectedZone }) => {
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
           </button>
-          <button className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300 flex items-center transition-colors">
-            <Maximize className="h-4 w-4 mr-1" />
-            Fullscreen
+          <button 
+            onClick={handleFullscreen}
+            className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300 flex items-center transition-colors"
+            title={isFullscreen ? "Exit fullscreen" : "View map in fullscreen"}
+          >
+            {isFullscreen ? <Minimize className="h-4 w-4 mr-1" /> : <Maximize className="h-4 w-4 mr-1" />}
+            {isFullscreen ? "Exit" : "Fullscreen"}
           </button>
         </div>
       </div>
       
-      <div className="relative h-96 bg-gray-200 rounded-lg overflow-hidden">
+      <div className={`relative ${isFullscreen ? 'h-screen' : 'h-96'} bg-gray-200 rounded-lg overflow-hidden`}>
         <div className="absolute inset-0">
-          <div className="grid grid-cols-3 grid-rows-2 h-full w-full gap-2 p-4">
+          <div className={`grid grid-cols-3 grid-rows-2 h-full w-full gap-2 p-4 ${isFullscreen ? 'gap-4 p-8' : ''}`}>
             {zonesArray.slice(0, 6).map((zone, index) => (
               <div
                 key={zone.id}

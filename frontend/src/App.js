@@ -10,6 +10,7 @@ import ZoneDetails from './components/ZoneDetails';
 import Charts from './components/Charts';
 import RecentAlerts from './components/RecentAlerts';
 import AlertModal from './components/AlertModal';
+import AudioControlPanel from './components/AudioControlPanel';
 import { fetchZones, fetchAlerts, fetchPrediction } from './services/api';
 
 function App() {
@@ -22,6 +23,9 @@ function App() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [audioAlarmActive, setAudioAlarmActive] = useState(false);
+  const [audioAlarmLevel, setAudioAlarmLevel] = useState('');
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
 
   // Check for existing login session
   useEffect(() => {
@@ -42,11 +46,20 @@ function App() {
   // Fetch initial data when logged in
   useEffect(() => {
     if (isLoggedIn) {
-      loadData();
+      console.log('User logged in, starting data loading with delay...');
       
-      // Set up auto-refresh every 30 seconds
-      const interval = setInterval(loadData, 30000);
-      return () => clearInterval(interval);
+      // Add 1 second delay before first data load (quick but prevents immediate sounds)
+      const initialDelay = setTimeout(() => {
+        loadData();
+      }, 1000);
+      
+      // Set up auto-refresh every 20 seconds for faster demo progression
+      const refreshInterval = setInterval(loadData, 20000);
+      
+      return () => {
+        clearTimeout(initialDelay);
+        clearInterval(refreshInterval);
+      };
     }
   }, [isLoggedIn]);
 
@@ -65,12 +78,27 @@ function App() {
         alert.alert_level === 'CRITICAL' && alert.status === 'ACTIVE'
       );
       
+      const warningAlerts = alertsData.filter(alert => 
+        alert.alert_level === 'WARNING' && alert.status === 'ACTIVE'
+      );
+      
       if (criticalAlerts.length > 0) {
         const alertMsg = `${criticalAlerts[0].zone_name} shows critical conditions. ${criticalAlerts[0].recommended_action}`;
         setAlertMessage(alertMsg);
         setShowAlert(true);
         setShowModal(true);
+        setAudioAlarmActive(true);
+        setAudioAlarmLevel('CRITICAL');
         toast.error(alertMsg);
+      } else if (warningAlerts.length > 0) {
+        const alertMsg = `${warningAlerts[0].zone_name} shows warning conditions. ${warningAlerts[0].recommended_action}`;
+        setAudioAlarmActive(true);
+        setAudioAlarmLevel('WARNING');
+        toast.warn(alertMsg);
+      } else {
+        // No active critical or warning alerts
+        setAudioAlarmActive(false);
+        setAudioAlarmLevel('');
       }
 
     } catch (error) {
@@ -124,6 +152,36 @@ function App() {
 
   const closeModal = () => {
     setShowModal(false);
+  };
+
+  const handleTestCritical = () => {
+    // Simulate critical alert for testing
+    setAudioAlarmActive(true);
+    setAudioAlarmLevel('CRITICAL');
+    setAlertMessage('TEST: Critical danger detected in Zone B - Immediate evacuation required!');
+    setShowAlert(true);
+    toast.error('🚨 TEST CRITICAL ALERT: Audio alarm triggered!');
+    
+    // Auto-clear after 10 seconds
+    setTimeout(() => {
+      setAudioAlarmActive(false);
+      setShowAlert(false);
+    }, 10000);
+  };
+
+  const handleTestWarning = () => {
+    // Simulate warning alert for testing
+    setAudioAlarmActive(true);
+    setAudioAlarmLevel('WARNING');
+    setAlertMessage('TEST: Warning conditions detected in Zone D - Increased monitoring required!');
+    setShowAlert(true);
+    toast.warn('⚠️ TEST WARNING ALERT: Audio beep triggered!');
+    
+    // Auto-clear after 8 seconds
+    setTimeout(() => {
+      setAudioAlarmActive(false);
+      setShowAlert(false);
+    }, 8000);
   };
 
   // Show login page if not logged in
@@ -241,7 +299,12 @@ function App() {
                     <span className="text-sm">SMS alerts for critical events</span>
                   </label>
                   <label className="flex items-center">
-                    <input type="checkbox" defaultChecked className="mr-2" />
+                    <input 
+                      type="checkbox" 
+                      checked={!isAudioMuted}
+                      onChange={(e) => setIsAudioMuted(!e.target.checked)}
+                      className="mr-2" 
+                    />
                     <span className="text-sm">Sound alerts</span>
                   </label>
                 </div>
@@ -257,6 +320,14 @@ function App() {
           onClose={closeModal}
         />
       )}
+
+      <AudioControlPanel 
+        isActive={audioAlarmActive}
+        riskLevel={audioAlarmLevel}
+        onToggleMute={setIsAudioMuted}
+        onTestCritical={handleTestCritical}
+        onTestWarning={handleTestWarning}
+      />
 
       <ToastContainer 
         position="top-right"

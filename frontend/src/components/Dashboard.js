@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, AlertCircle, AlertTriangle, Clock } from 'lucide-react';
+import { CheckCircle, AlertCircle, AlertTriangle, Clock, Shield, Activity, TrendingUp, Zap, MapPin, Mountain } from 'lucide-react';
 
 const Dashboard = ({ zones = [], lastPrediction, alerts = [] }) => {
   // Ensure zones is an array
@@ -49,41 +49,59 @@ const Dashboard = ({ zones = [], lastPrediction, alerts = [] }) => {
 
       {/* Last Prediction */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Last Prediction</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <Activity className="mr-2 text-blue-600" size={20} />
+          AI Prediction Engine
+        </h3>
         <div className="flex items-center">
           <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-            <Clock className="text-blue-600" size={24} />
+            <TrendingUp className="text-blue-600" size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Last Updated</p>
+            <p className="text-sm font-medium text-gray-500">Last Analysis</p>
             <p className="text-xl font-semibold text-gray-900">{lastUpdated}</p>
           </div>
         </div>
         <div className="mt-4">
-          <p className="text-sm font-medium text-gray-500">Next Prediction</p>
-          <p className="text-xl font-semibold text-gray-900">In 5 minutes</p>
+          <p className="text-sm font-medium text-gray-500">Next Scan</p>
+          <p className="text-xl font-semibold text-gray-900">In 20 seconds</p>
         </div>
       </div>
 
       {/* System Status */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">System Status</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <Shield className="mr-2 text-green-600" size={20} />
+          System Health
+        </h3>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-500">AI Model</span>
-          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+          <span className="text-sm font-medium text-gray-500 flex items-center">
+            <Mountain className="mr-2 text-gray-400" size={16} />
+            AI Model
+          </span>
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+            <Zap className="mr-1" size={12} />
             Active
           </span>
         </div>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-500">Data Feed</span>
-          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-            Receiving
+          <span className="text-sm font-medium text-gray-500 flex items-center">
+            <Activity className="mr-2 text-gray-400" size={16} />
+            Data Feed
+          </span>
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+            <Activity className="mr-1" size={12} />
+            Live
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500">Alert System</span>
-          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-            Enabled
+          <span className="text-sm font-medium text-gray-500 flex items-center">
+            <AlertTriangle className="mr-2 text-gray-400" size={16} />
+            Alert System
+          </span>
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+            <CheckCircle className="mr-1" size={12} />
+            Armed
           </span>
         </div>
       </div>

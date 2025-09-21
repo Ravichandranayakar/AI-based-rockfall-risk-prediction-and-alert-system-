@@ -1,0 +1,45 @@
+{
+  "scenario_name": "All Safe - No Alarms",
+  "zones": [
+    {
+      "id": "A",
+      "name": "North_Pit_Wall",
+      "status": "SAFE",
+      "risk": "Low",
+      "displacement": 1.2,
+      "vibration": 0.5
+    },
+    {
+      "id": "B",
+      "name": "South_Slope",
+      "status": "SAFE",
+      "risk": "Low",
+      "displacement": 1.8,
+      "vibration": 0.7
+    },
+    {
+      "id": "C",
+      "name": "East_Wall",
+      "status": "SAFE",
+      "risk": "Low",
+      "displacement": 0.9,
+      "vibration": 0.4
+    },
+    {
+      "id": "D",
+      "name": "West_Highwall",
+      "status": "SAFE",
+      "risk": "Low",
+      "displacement": 1.5,
+      "vibration": 0.6
+    },
+    {
+      "id": "E",
+      "name": "Central_Zone",
+      "status": "SAFE",
+      "risk": "Low",
+      "displacement": 1.1,
+      "vibration": 0.5
+    }
+  ]
+}

@@ -20,3 +20,29 @@ body {
   transform: scale(1.05);
   z-index: 10;
 }
+
+/* Fullscreen styles for mine map */
+#mine-map-container:fullscreen {
+  padding: 2rem;
+  background: white;
+}
+
+#mine-map-container:fullscreen .grid {
+  height: calc(100vh - 8rem);
+}
+
+#mine-map-container:fullscreen .map-zone {
+  font-size: 1.5rem;
+}
+
+/* Fallback for browsers that don't support fullscreen */
+.mine-map-maximized {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  background: white !important;
+  padding: 2rem !important;
+}

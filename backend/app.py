@@ -135,38 +135,54 @@ class RockfallAPI:
         vibration = sensor_data.get('vibration_mm_s', 0)
         zone_id = sensor_data.get('zone_id', 'A')
         
-        # Get zone thresholds
-        thresholds = {'displacement_warning': 5, 'displacement_critical': 8,
-                     'vibration_warning': 1.5, 'vibration_critical': 2.5}
+        # Default thresholds (more sensitive for demonstration)
+        thresholds = {
+            'displacement_warning': 5, 
+            'displacement_critical': 8,
+            'vibration_warning': 1.5, 
+            'vibration_critical': 2.5
+        }
         
-        if self.zones_data:
+        # Try to get zone-specific thresholds
+        if self.zones_data and 'zones' in self.zones_data:
             for zone in self.zones_data['zones']:
-                if zone['zone_id'] == zone_id:
-                    thresholds = zone['risk_thresholds']
+                if zone.get('zone_id') == zone_id and 'risk_thresholds' in zone:
+                    thresholds.update(zone['risk_thresholds'])
                     break
         
-        # Calculate risk
-        if (displacement >= thresholds['displacement_critical'] or 
-            vibration >= thresholds['vibration_critical']):
+        logger.info(f"Zone {zone_id}: displacement={displacement}, vibration={vibration}")
+        logger.info(f"Thresholds: {thresholds}")
+        
+        # Calculate risk with explicit logging
+        is_critical = (displacement >= thresholds['displacement_critical'] or 
+                      vibration >= thresholds['vibration_critical'])
+        is_warning = (displacement >= thresholds['displacement_warning'] or 
+                     vibration >= thresholds['vibration_warning'])
+        
+        if is_critical:
             risk_level = 'critical'
-            risk_score = 8.5
-        elif (displacement >= thresholds['displacement_warning'] or 
-              vibration >= thresholds['vibration_warning']):
+            risk_score = min(10.0, 7.0 + (displacement / 10.0) + (vibration / 2.0))
+            logger.warning(f"CRITICAL RISK DETECTED: Zone {zone_id}, Score {risk_score}")
+        elif is_warning:
             risk_level = 'high'
-            risk_score = 6.5
+            risk_score = min(8.0, 5.0 + (displacement / 10.0) + (vibration / 2.0))
+            logger.warning(f"HIGH RISK DETECTED: Zone {zone_id}, Score {risk_score}")
         else:
             risk_level = 'low'
-            risk_score = 3.0
+            risk_score = min(5.0, 1.0 + (displacement / 10.0) + (vibration / 2.0))
         
-        return {
+        result = {
             'risk_level': risk_level,
-            'risk_score': risk_score,
+            'risk_score': float(risk_score),
             'risk_probabilities': {
-                'low': 0.7 if risk_level == 'low' else 0.2,
-                'high': 0.7 if risk_level == 'high' else 0.2,
-                'critical': 0.7 if risk_level == 'critical' else 0.1
+                'low': 0.8 if risk_level == 'low' else 0.1,
+                'high': 0.8 if risk_level == 'high' else 0.1,
+                'critical': 0.8 if risk_level == 'critical' else 0.1
             }
         }
+        
+        logger.info(f"Prediction result: {result}")
+        return result
 
 # Initialize API
 api = RockfallAPI()

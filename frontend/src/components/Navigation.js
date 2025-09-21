@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, User, Maximize, RefreshCw, Settings, FileText, AlertCircle, Home, LogOut } from 'lucide-react';
+import { AlertTriangle, User, Maximize, RefreshCw, Settings, FileText, AlertCircle, Home, LogOut, Shield, Activity, BarChart3, Map, Bell } from 'lucide-react';
 
 const Navigation = ({ onRefresh, currentUser, onLogout }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
