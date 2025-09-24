@@ -1,0 +1,13 @@
+backend/
+docs/
+sample-data/
+venv/
+*.md
+!README.md
+.git/
+.gitignore
+*.bat
+*.py
+test_*.py
+validate_*.py
+ngrok.exe
