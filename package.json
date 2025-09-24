@@ -1,0 +1,32 @@
+{
+  "name": "ai-rockfall-prediction-system",
+  "version": "1.0.0",
+  "description": "AI-Based Rockfall Risk Prediction and Alert System for Smart India Hackathon 2025",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd frontend && npm start",
+    "dev": "cd frontend && npm run dev",
+    "install-frontend": "cd frontend && npm install",
+    "test": "cd frontend && npm test"
+  },
+  "keywords": [
+    "ai",
+    "rockfall",
+    "prediction",
+    "alert-system",
+    "smart-india-hackathon",
+    "sih2025",
+    "react",
+    "dashboard"
+  ],
+  "author": "SIH 2025 Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ravichandranayakar/AI-based-rockfall-risk-prediction-and-alert-system-.git"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
