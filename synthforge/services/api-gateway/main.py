@@ -202,7 +202,7 @@ async def login(request: Request, credentials: dict):
     password = credentials.get("password")
     
     # Mock user validation (replace with actual database validation)
-    if username == "admin" and password == "synthforge2025":
+    if username == "admin" and password == os.getenv("ADMIN_PASSWORD", "changeme123"):
         token_data = {
             "sub": username,
             "roles": ["admin", "operator"],

@@ -1,0 +1,56 @@
+# SynthForge .gitignore
+
+# Environment files with secrets
+.env
+*.env
+!.env.example
+
+# Database files
+*.db
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Secrets and keys
+*.key
+*.pem
+*.crt
+secrets/
