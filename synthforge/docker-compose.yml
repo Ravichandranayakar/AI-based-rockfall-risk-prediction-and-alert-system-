@@ -1,0 +1,433 @@
+# SynthForge Production Docker Compose
+# Complete microservices orchestration with monitoring and scaling
+
+version: '3.8'
+
+services:
+  # Database Services
+  postgresql:
+    image: postgres:15-alpine
+    container_name: synthforge-postgres
+    environment:
+      POSTGRES_DB: synthforge_db
+      POSTGRES_USER: synthforge
+      POSTGRES_PASSWORD: synthforge123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./shared/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synthforge -d synthforge_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: synthforge-redis
+    command: redis-server --appendonly yes --requirepass synthforge123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: synthforge-influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: synthforge
+      DOCKER_INFLUXDB_INIT_PASSWORD: synthforge123
+      DOCKER_INFLUXDB_INIT_ORG: synthforge-org
+      DOCKER_INFLUXDB_INIT_BUCKET: sensor-data
+    volumes:
+      - influx_data:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  # Message Queue
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: synthforge-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    networks:
+      - synthforge-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: synthforge-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "29092:29092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+
+  # MLflow Tracking Server
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.8.1
+    container_name: synthforge-mlflow
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://synthforge:synthforge123@postgresql:5432/synthforge_db
+      --default-artifact-root s3://synthforge-mlflow-artifacts
+      --host 0.0.0.0
+      --port 5000
+    depends_on:
+      - postgresql
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: synthforge
+      AWS_SECRET_ACCESS_KEY: synthforge123
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  # Object Storage (MinIO for MLflow artifacts)
+  minio:
+    image: minio/minio:latest
+    container_name: synthforge-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: synthforge
+      MINIO_ROOT_PASSWORD: synthforge123
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - synthforge-network
+
+  # Core Services
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: synthforge-api-gateway
+    depends_on:
+      - redis
+      - postgresql
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql+asyncpg://synthforge:synthforge123@postgresql:5432/synthforge_db
+      - DATA_INGESTION_URL=http://data-ingestion:8001
+      - ML_PIPELINE_URL=http://ml-pipeline:8002
+      - ALERT_SERVICE_URL=http://alert-service:8003
+      - DASHBOARD_URL=http://dashboard:3000
+      - EDGE_DEVICE_URL=http://edge-device:8004
+      - JWT_SECRET=synthforge-production-secret-2025
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-gateway.rule=Host(`api.synthforge.local`)"
+
+  data-ingestion:
+    build:
+      context: ./services/data-ingestion
+      dockerfile: Dockerfile
+    container_name: synthforge-data-ingestion
+    depends_on:
+      - postgresql
+      - redis
+      - kafka
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://synthforge:synthforge123@postgresql:5432/synthforge_db
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_SERVERS=kafka:9092
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+
+  ml-pipeline:
+    build:
+      context: ./services/ml-pipeline
+      dockerfile: Dockerfile
+    container_name: synthforge-ml-pipeline
+    depends_on:
+      - postgresql
+      - redis
+      - kafka
+      - mlflow
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://synthforge:synthforge123@postgresql:5432/synthforge_db
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_SERVERS=kafka:9092
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MODEL_REGISTRY_PATH=/app/models
+    ports:
+      - "8002:8002"
+    volumes:
+      - ml_models:/app/models
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - synthforge-network
+
+  alert-service:
+    build:
+      context: ./services/alert-service
+      dockerfile: Dockerfile
+    container_name: synthforge-alert-service
+    depends_on:
+      - postgresql
+      - redis
+      - kafka
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://synthforge:synthforge123@postgresql:5432/synthforge_db
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_SERVERS=kafka:9092
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - TWILIO_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_TOKEN=${TWILIO_AUTH_TOKEN}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  dashboard:
+    build:
+      context: ./services/dashboard
+      dockerfile: Dockerfile
+    container_name: synthforge-dashboard
+    depends_on:
+      - api-gateway
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8000/api/v1
+      - REACT_APP_WS_URL=ws://localhost:8000/ws
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.synthforge.local`)"
+
+  edge-device:
+    build:
+      context: ./services/edge-device
+      dockerfile: Dockerfile
+    container_name: synthforge-edge-device
+    depends_on:
+      - api-gateway
+    environment:
+      - API_GATEWAY_URL=http://api-gateway:8000
+      - DEVICE_ID=edge-001
+      - LOCATION_LAT=40.7128
+      - LOCATION_LON=-74.0060
+    ports:
+      - "8004:8004"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  # Monitoring and Observability
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: synthforge-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: synthforge-grafana
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=synthforge123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  # Log aggregation
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    container_name: synthforge-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    container_name: synthforge-kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+  # Load Balancer and Reverse Proxy
+  traefik:
+    image: traefik:v3.0
+    container_name: synthforge-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@synthforge.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    restart: unless-stopped
+    networks:
+      - synthforge-network
+
+# Persistent Volumes
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  influx_data:
+    driver: local
+  kafka_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  zookeeper_logs:
+    driver: local
+  minio_data:
+    driver: local
+  ml_models:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  traefik_certs:
+    driver: local
+
+# Networks
+networks:
+  synthforge-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

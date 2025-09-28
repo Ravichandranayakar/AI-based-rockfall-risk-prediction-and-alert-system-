@@ -1,0 +1,12 @@
+# Simple Backend Dependencies
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Optional database (if needed later)
+asyncpg==0.29.0
+
+# Development
+python-dotenv==1.0.0
