@@ -254,13 +254,4 @@ python test_system.py           # Run validation tests
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Smart India Hackathon 2025
-
-**Team**: [Your Team Name]  
-**Problem Statement**: AI-based rockfall prediction and alert system  
-**Category**: Software  
-**Technology Stack**: Python, React, Docker, Machine Learning
-
----
-
 **Built with ❤️ for safety in mining operations** 🏔️⛏️
